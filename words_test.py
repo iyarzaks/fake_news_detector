@@ -1,4 +1,5 @@
-import pandas
+import pandas as pd
 
 
-data = pandas.read_csv()
+data = pd.read_csv('Classified_Data_kaggle.csv', engine='python')
+print (data['URLs'])
