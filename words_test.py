@@ -1,5 +1,6 @@
 import pandas as pd
-
+from project_utils import *
 
 data = pd.read_csv('Classified_Data_kaggle.csv', engine='python')
-print (data['URLs']) 
+artcles_list = data['Body'].values.astype('U').tolist()
+to_bag_of_words(artcles_list)
