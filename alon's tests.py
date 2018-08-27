@@ -23,7 +23,7 @@ print("Body: ", myArticle.cleaned_text)'''
 
 myArticlesDict = {}
 
-originalDataFrame = pd.read_csv('data.csv')
+originalDataFrame = pd.read_csv('Classified_Data_kaggle.csv', encoding = "ISO-8859-1")
 # print(originalDataFrame)
 '''print(originalDataFrame.columns)
 for column in originalDataFrame.columns:
@@ -36,30 +36,52 @@ ourDataFrame['Date'] = 0
 ourDataFrame['HeadLine'] = 0
 ourDataFrame['Body'] = 0
 
+count = 0
 for index, row in originalDataFrame.iterrows():
-    count = 0
+    gooseErrorFlag = False
     currURL = originalDataFrame.at[index, 'URLs']
+
+    if 'comedy-speaks-to-modern-america-says' in currURL:
+        breakPoint=1
 
     newspaperArticle = newspaper.Article(currURL)
     newspaperArticle.download()
-    newspaperArticle.parse()
-    newspaperAuthor = newspaperArticle.authors
-    newspaperDate = newspaperArticle.publish_date
-    newspaperHeadLine = newspaperArticle.title
-    newspaperBody = newspaperArticle.text
+    if newspaperArticle.download_state == 2: # 2=downloaded, 1=unsuccessful download
+        newspaperArticle.parse()
+        newspaperAuthor = newspaperArticle.authors
+        newspaperDate = newspaperArticle.publish_date
+        newspaperHeadLine = newspaperArticle.title
+        newspaperBody = newspaperArticle.text
+    else:
+        newspaperAuthor = None
+        newspaperDate = None
+        newspaperHeadLine = None
+        newspaperBody = None
 
+    # goose = goose3.Goose( {'strict':False} )
     goose = goose3.Goose()
-    gooseArticle = goose.extract(url=currURL)
-    gooseAuthor = gooseArticle.authors
-    gooseDate = gooseArticle.publish_date
-    gooseHeadLine = gooseArticle.title
-    gooseBody = gooseArticle.cleaned_text
+    try:
+        gooseArticle = goose.extract(url=currURL)
+    except Exception as error:
+        errorString = str(error)
+        if '404' in errorString:
+            gooseAuthor = None
+            gooseDate = None
+            gooseHeadLine = None
+            gooseBody = None
+            gooseErrorFlag = True
+
+    if gooseErrorFlag == False:
+        gooseAuthor = gooseArticle.authors
+        gooseDate = gooseArticle.publish_date
+        gooseHeadLine = gooseArticle.title
+        gooseBody = gooseArticle.cleaned_text
 
     ourDataFrame.loc[count, 'URLs'] = currURL
-    ourDataFrame.loc[count, 'Author'] = newspaperAuthor
+    '''ourDataFrame.loc[count, 'Author'] = newspaperAuthor
     ourDataFrame.loc[count, 'Date'] = newspaperDate
     ourDataFrame.loc[count, 'HeadLine'] = newspaperHeadLine
-    ourDataFrame.loc[count, 'Body'] = newspaperBody
+    ourDataFrame.loc[count, 'Body'] = newspaperBody'''
 
     '''if ( (ourDataFrame.loc[count, 'Author']==None) or (ourDataFrame.loc[count, 'Author']=='None') or (ourDataFrame.loc[count, 'Author']=='')  ):
         ourDataFrame.loc[count, 'Author'] = gooseAuthor
@@ -67,7 +89,7 @@ for index, row in originalDataFrame.iterrows():
 
     count = count + 1
 
-    print(ourDataFrame.loc[[0]])
+    #print(ourDataFrame.loc[[0]])
     x=0
 
 
