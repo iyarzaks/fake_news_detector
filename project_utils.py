@@ -1,7 +1,8 @@
-import pandas
+import pandas as pd
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
 from sklearn.feature_selection import mutual_info_classif
+
 def to_bag_of_words(articles,labels):
     # vectorizer = TfidfVectorizer()
     # vectorizer.fit(articles)

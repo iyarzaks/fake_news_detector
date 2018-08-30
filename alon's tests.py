@@ -1,6 +1,8 @@
 import newspaper
 import goose3
 import pandas as pd
+import nltk.data
+import re
 
 # myURL = "http://www.bbc.com/news/world-us-canada-41419190" # irrelevant
 # myURL = "https://www.nytimes.com/2017/10/04/us/marilou-danley-stephen-paddock.html" # irrelevant
@@ -115,9 +117,13 @@ for index, row in originalDataFrame.iterrows():  # iterate the df
 breakPoint=0
 
 
+# takes a string of body text and splits (and prints) it into whole sentences.
+tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+print( '\n-----\n'.join(tokenizer.tokenize(originalDataFrame.at[0, 'Body'])))
 
-
-
+# checks if there's a typo or a spelling mistake in a single world
+d = enchant.Dict("en_US")
+d.check("enchant")
 
 
 
