@@ -1,14 +1,18 @@
 import newspaper
 import goose3
 import pandas as pd
+import nltk.data
+import re
+from nltk.corpus import brown
+import nltk
 
-myURL = "https://www.reuters.com/article/us-filmfestival-london-lastflagflying/linklaters-war-veteran-comedy-speaks-to-modern-america-says-star-idUSKBN1CD0X2"
+my_dict = {'x':500, 'y':5874, 'z': 560}
 
-article = newspaper.Article(myURL)
-article.download()
-article.parse()
-print("Authors: ", article.authors)
-print("Date: ", article.publish_date)
-print("Headline: ", article.title)
-print("Body: ", article.text)
+key_max = max(my_dict.keys(), key=(lambda k: my_dict[k]))
+key_min = min(my_dict.keys(), key=(lambda k: my_dict[k]))
+
+print(key_max, ': ', my_dict[key_max])
+print('Minimum Value: ',my_dict[key_min])
+
+
 
