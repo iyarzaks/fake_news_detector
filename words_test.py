@@ -3,25 +3,35 @@ from project_utils import *
 from sklearn import linear_model, datasets
 from sklearn.model_selection import cross_val_predict
 from sklearn.linear_model import LogisticRegressionCV
+import sys
+#from sklearn.cross_validation import KFold
+from sklearn.svm import SVC
+from sklearn.model_selection import cross_val_score
 
-data = pd.read_csv('Classified_Data_kaggle.csv', engine='python')
+
+all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python')
+print (all_data.shape)
+bad_input = all_data.loc[~all_data['Label (1=true)'].isin(['0','1'])]
+print_to_json(bad_input.index.values.tolist(),"bad_input_indexes")
+data = all_data.loc[all_data['Label (1=true)'].isin(['0','1'])]
+print (data.shape)
 artcles_list = data['Body'].values.astype('U').tolist()
 labels = data['Label (1=true)'].values.astype('U').tolist()
 words = read_json("top_50.json")
 #to_bag_of_words(artcles_list,labels)
 
 df_with_imp_words = build_table_form_words(data,words)
-X = df_with_imp_words.iloc[:300,:50]
-Y = df_with_imp_words['Label (1=true)']
-Y = Y.iloc[:300]
-# logreg = linear_model.LogisticRegression(C=1e5)
-# logreg.fit(X, Y)
-# print (np.around(logreg.coef_),2)
-# X = df_with_imp_words.iloc[100:200,:50]
-# res = logreg.predict(X)
+X = df_with_imp_words.iloc[:4000,0:50]
+Y = data['Label (1=true)']
+Y_train = Y.iloc[:4000]
 
-lr = LogisticRegressionCV(Cs=15)
-lr = lr.fit(X, Y)
-print (lr.scores_)
-coef_list = lr.coef_[0].tolist()
-print ([format(a, '.2f') for a in coef_list])
+#fold = KFold(len(Y_train), n_folds=10, shuffle=True, random_state=777)
+#lr = lr_func(X,Y_train)
+
+
+#mean_scores = np.mean(scores, axis=0)
+# coef_plot(lr,df_with_imp_words)
+
+#manual_check(df_with_imp_words,Y,lr)
+clf = svm_func(X, Y_train)
+coef_plot(clf,df_with_imp_words)
