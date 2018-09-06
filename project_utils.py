@@ -80,7 +80,7 @@ def manual_check(df_with_imp_words,Y,lr):
     print (1-len(un_matched_digits)/len(Y_test))
 
 
-def lr_func(X,Y_train):
+def lr_func(X,Y):
     lr = LogisticRegressionCV(Cs=10
             ,penalty='l2'
             ,scoring='accuracy'
@@ -91,7 +91,7 @@ def lr_func(X,Y_train):
             ,solver='newton-cg'
             ,tol=10
         )
-    lr = lr.fit(X, Y_train)
+    lr = lr.fit(X, Y)
     print ('Max auc:', lr.scores_['1'].mean(axis=0).max())
     return lr
     #scores = lr.scores_['1']
