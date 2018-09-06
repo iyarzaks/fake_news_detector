@@ -33,7 +33,7 @@ print("Body: ", myArticle.cleaned_text)'''
 
 
 originalDataFrame = pd.read_csv('Classified_Data_kaggle.csv', encoding = "ISO-8859-1")  # reading CSV file of data, ISO encoding is just a standard way to avoid some errors.
-originalDataFrame = originalDataFrame.iloc[0:2]  # filters 50 first rows of data frame, for quick and easy self checking.
+# originalDataFrame = originalDataFrame.iloc[0:6]  # filters 50 first rows of data frame, for quick and easy self checking.
 
 # irrelevant - just a way to check the reading of CSV file. printing the data frame and its columns.
 # print(originalDataFrame)
@@ -131,128 +131,156 @@ for column in originalDataFrame.columns:
 # d.check("enchant")
 
 
-
+headerFlagError = False
+bodyFlagError = False
 initDataPerArticle = {}
 for index, row in originalDataFrame.iterrows():
     articleAttrs = {}
+    headerFlagError = False
+    bodyFlagError = False
     currentURL = originalDataFrame.at[index, 'URLs']
     currentHeadLineList = originalDataFrame.at[index, 'Headline']
-    currentHeadLineStr = re.sub("[^\w]", " ",  currentHeadLineList).split()
     currentBodyList = originalDataFrame.at[index, 'Body']
-    currentBodyStr = re.sub("[^\w]", " ",  currentBodyList).split()
+    if ((currentHeadLineList == []) or (not(isinstance(currentHeadLineList, str)))):
+        headerFlagError = True
+    if ((currentBodyList == []) or (not(isinstance(currentBodyList, str)))):
+        bodyFlagError = True
 
-    # number of sentences, mean length, shortest and longest ones
-    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-    HeadLineSentences = tokenizer.tokenize(currentHeadLineList)
-    BodySentences = tokenizer.tokenize(currentBodyList)
+    if ( (headerFlagError==False) and (bodyFlagError==False) ):
+        currentHeadLineStr = re.sub("[^\w]", " ",  currentHeadLineList).split()
+        currentBodyStr = re.sub("[^\w]", " ",  currentBodyList).split()
 
-    articleAttrs['numOfHeaderSentences'] = len(HeadLineSentences)
-    articleAttrs['numOfBodySentences'] = len(BodySentences)
+        # number of sentences, mean length, shortest and longest ones
+        tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+        HeadLineSentences = tokenizer.tokenize(currentHeadLineList)
+        BodySentences = tokenizer.tokenize(currentBodyList)
 
-    meanSentencesCount = 0
-    minHeaderLength = 999999999
-    maxHeaderLength = 0
-    for headerSentence in HeadLineSentences:
-        words = re.sub("[^\w]", " ",  headerSentence).split()
-        sumToAdd = len(words)
-        meanSentencesCount = meanSentencesCount + sumToAdd
+        articleAttrs['numOfHeaderSentences'] = len(HeadLineSentences)
+        articleAttrs['numOfBodySentences'] = len(BodySentences)
 
-        if len(words) != 0:
-            if len(words) < minHeaderLength:
-                minHeaderLength = len(words)
+        meanSentencesCount = 0
+        minHeaderLength = 999999999
+        maxHeaderLength = 0
+        for headerSentence in HeadLineSentences:
+            words = re.sub("[^\w]", " ",  headerSentence).split()
+            sumToAdd = len(words)
+            meanSentencesCount = meanSentencesCount + sumToAdd
 
-            if len(words) > maxHeaderLength:
-                maxHeaderLength = len(words)
+            if len(words) != 0:
+                if len(words) < minHeaderLength:
+                    minHeaderLength = len(words)
 
-    articleAttrs['meanHeaderLen'] = meanSentencesCount / len(HeadLineSentences)
-    articleAttrs['minHeaderLength'] = minHeaderLength
-    articleAttrs['maxHeaderLength'] = maxHeaderLength
+                if len(words) > maxHeaderLength:
+                    maxHeaderLength = len(words)
 
-
-    meanSentencesCount = 0
-    minBodyLength = 999999999
-    maxBodyLength = 0
-    for bodySentence in BodySentences:
-        words = re.sub("[^\w]", " ",  bodySentence).split()
-        sumToAdd = len(words)
-        meanSentencesCount = meanSentencesCount + sumToAdd
-
-        if len(words) != 0:
-            if len(words) < minBodyLength:
-                minBodyLength = len(words)
-
-            if len(words) > maxBodyLength:
-                maxBodyLength = len(words)
-
-    articleAttrs['meanBodyLen'] = meanSentencesCount / len(BodySentences)
-    articleAttrs['minBodyLength'] = minBodyLength
-    articleAttrs['maxBodyLength'] = maxBodyLength
+        articleAttrs['meanHeaderLen'] = meanSentencesCount / len(HeadLineSentences)
+        articleAttrs['minHeaderLength'] = minHeaderLength
+        articleAttrs['maxHeaderLength'] = maxHeaderLength
 
 
-    # check for misspells
-    word_list = brown.words()
-    word_set = set(word_list)
-    headerMisspellCount = 0
-    bodyMisspellCount = 0
-    for headerWord in currentHeadLineStr:
-        if headerWord not in word_set:
-            headerMisspellCount = headerMisspellCount + 1
+        meanSentencesCount = 0
+        minBodyLength = 999999999
+        maxBodyLength = 0
+        for bodySentence in BodySentences:
+            words = re.sub("[^\w]", " ",  bodySentence).split()
+            sumToAdd = len(words)
+            meanSentencesCount = meanSentencesCount + sumToAdd
 
-    for bodyWord in currentBodyStr:
-        if bodyWord not in word_set:
-            bodyMisspellCount = bodyMisspellCount + 1
+            if len(words) != 0:
+                if len(words) < minBodyLength:
+                    minBodyLength = len(words)
 
-    articleAttrs['headerMisspellRate'] = headerMisspellCount / len(currentHeadLineStr)
-    articleAttrs['bodyMisspellRate'] = bodyMisspellCount / len(currentBodyStr)
+                if len(words) > maxBodyLength:
+                    maxBodyLength = len(words)
+
+        articleAttrs['meanBodyLen'] = meanSentencesCount / len(BodySentences)
+        articleAttrs['minBodyLength'] = minBodyLength
+        articleAttrs['maxBodyLength'] = maxBodyLength
 
 
-    # check for word grammar category
-    headerGrammarDict = {}
-    for line in HeadLineSentences:
-        tmp = nltk.word_tokenize(line)
-        grammarPerLine = nltk.pos_tag(tmp)
+        # check for misspells
+        word_list = brown.words()
+        word_set = set(word_list)
+        headerMisspellCount = 0
+        bodyMisspellCount = 0
+        for headerWord in currentHeadLineStr:
+            if headerWord not in word_set:
+                headerMisspellCount = headerMisspellCount + 1
 
-        for pair in grammarPerLine:
-            grammarType = pair[1]
+        for bodyWord in currentBodyStr:
+            if bodyWord not in word_set:
+                bodyMisspellCount = bodyMisspellCount + 1
 
-            if grammarType not in headerGrammarDict.keys():
-                headerGrammarDict[grammarType] = 1
-            else:
-                tmpValue = headerGrammarDict[grammarType]
-                headerGrammarDict[grammarType] = tmpValue + 1
+        articleAttrs['headerMisspellRate'] = headerMisspellCount / len(currentHeadLineStr)
+        articleAttrs['bodyMisspellRate'] = bodyMisspellCount / len(currentBodyStr)
 
-    bodyGrammarDict = {}
-    for line in BodySentences:
-        tmp = nltk.word_tokenize(line)
-        grammarPerLine = nltk.pos_tag(tmp)
 
-        for pair in grammarPerLine:
-            grammarType = pair[1]
+        # check for word grammar category
+        headerGrammarDict = {}
+        for line in HeadLineSentences:
+            tmp = nltk.word_tokenize(line)
+            grammarPerLine = nltk.pos_tag(tmp)
 
-            if grammarType not in bodyGrammarDict.keys():
-                bodyGrammarDict[grammarType] = 1
-            else:
-                tmpValue = bodyGrammarDict[grammarType]
-                bodyGrammarDict[grammarType] = tmpValue + 1
+            for pair in grammarPerLine:
+                grammarType = pair[1]
 
-    headerGrammarMaxKey = max(headerGrammarDict.keys(), key=(lambda k: headerGrammarDict[k]))
-    headerGrammarMinKey = min(headerGrammarDict.keys(), key=(lambda k: headerGrammarDict[k]))
-    headerGrammarMaxTimes = headerGrammarDict[headerGrammarMaxKey]
-    headerGrammarMinTimes = headerGrammarDict[headerGrammarMinKey]
-    articleAttrs['headerGrammarMaxKey'] = headerGrammarMaxKey
-    articleAttrs['headerGrammarMaxTimes'] = headerGrammarMaxTimes
-    articleAttrs['headerGrammarMinKey'] = headerGrammarMinKey
-    articleAttrs['headerGrammarMinTimes'] = headerGrammarMinTimes
+                if grammarType not in headerGrammarDict.keys():
+                    headerGrammarDict[grammarType] = 1
+                else:
+                    tmpValue = headerGrammarDict[grammarType]
+                    headerGrammarDict[grammarType] = tmpValue + 1
 
-    bodyGrammarMaxKey = max(bodyGrammarDict.keys(), key=(lambda k: bodyGrammarDict[k]))
-    bodyGrammarMinKey = min(bodyGrammarDict.keys(), key=(lambda k: bodyGrammarDict[k]))
-    bodyGrammarMaxTimes = bodyGrammarDict[bodyGrammarMaxKey]
-    bodyGrammarMinTimes = bodyGrammarDict[bodyGrammarMinKey]
-    articleAttrs['bodyGrammarMaxKey'] = bodyGrammarMaxKey
-    articleAttrs['bodyGrammarMaxTimes'] = bodyGrammarMaxTimes
-    articleAttrs['bodyGrammarMinKey'] = bodyGrammarMinKey
-    articleAttrs['bodyGrammarMinTimes'] = bodyGrammarMinTimes
+        bodyGrammarDict = {}
+        for line in BodySentences:
+            tmp = nltk.word_tokenize(line)
+            grammarPerLine = nltk.pos_tag(tmp)
 
+            for pair in grammarPerLine:
+                grammarType = pair[1]
+
+                if grammarType not in bodyGrammarDict.keys():
+                    bodyGrammarDict[grammarType] = 1
+                else:
+                    tmpValue = bodyGrammarDict[grammarType]
+                    bodyGrammarDict[grammarType] = tmpValue + 1
+
+        headerGrammarMaxKey = max(headerGrammarDict.keys(), key=(lambda k: headerGrammarDict[k]))
+        headerGrammarMinKey = min(headerGrammarDict.keys(), key=(lambda k: headerGrammarDict[k]))
+        headerGrammarMaxTimes = headerGrammarDict[headerGrammarMaxKey]
+        headerGrammarMinTimes = headerGrammarDict[headerGrammarMinKey]
+        articleAttrs['headerGrammarMaxKey'] = headerGrammarMaxKey
+        articleAttrs['headerGrammarMaxTimes'] = headerGrammarMaxTimes
+        articleAttrs['headerGrammarMinKey'] = headerGrammarMinKey
+        articleAttrs['headerGrammarMinTimes'] = headerGrammarMinTimes
+
+        bodyGrammarMaxKey = max(bodyGrammarDict.keys(), key=(lambda k: bodyGrammarDict[k]))
+        bodyGrammarMinKey = min(bodyGrammarDict.keys(), key=(lambda k: bodyGrammarDict[k]))
+        bodyGrammarMaxTimes = bodyGrammarDict[bodyGrammarMaxKey]
+        bodyGrammarMinTimes = bodyGrammarDict[bodyGrammarMinKey]
+        articleAttrs['bodyGrammarMaxKey'] = bodyGrammarMaxKey
+        articleAttrs['bodyGrammarMaxTimes'] = bodyGrammarMaxTimes
+        articleAttrs['bodyGrammarMinKey'] = bodyGrammarMinKey
+        articleAttrs['bodyGrammarMinTimes'] = bodyGrammarMinTimes
+
+    else:
+        articleAttrs['numOfHeaderSentences'] = 0
+        articleAttrs['numOfBodySentences'] = 0
+        articleAttrs['meanHeaderLen'] = 0
+        articleAttrs['minHeaderLength'] = 0
+        articleAttrs['maxHeaderLength'] = 0
+        articleAttrs['meanBodyLen'] = 0
+        articleAttrs['minBodyLength'] = 0
+        articleAttrs['maxBodyLength'] = 0
+        articleAttrs['headerMisspellRate'] = 0
+        articleAttrs['bodyMisspellRate'] = 0
+        articleAttrs['headerGrammarMaxKey'] = 0
+        articleAttrs['headerGrammarMaxTimes'] = 0
+        articleAttrs['headerGrammarMinKey'] = 0
+        articleAttrs['headerGrammarMinTimes'] = 0
+        articleAttrs['bodyGrammarMaxKey'] = 0
+        articleAttrs['bodyGrammarMaxTimes'] = 0
+        articleAttrs['bodyGrammarMinKey'] = 0
+        articleAttrs['bodyGrammarMinTimes'] = 0
 
     initDataPerArticle[currentURL] = articleAttrs
 

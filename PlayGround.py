@@ -6,13 +6,12 @@ import re
 from nltk.corpus import brown
 import nltk
 
-my_dict = {'x':500, 'y':5874, 'z': 560}
+mystr = 'hello i am alon'
+print(type(mystr))
 
-key_max = max(my_dict.keys(), key=(lambda k: my_dict[k]))
-key_min = min(my_dict.keys(), key=(lambda k: my_dict[k]))
+if isinstance(mystr, str):
+    print('yes')
+if not (isinstance(mystr, str)):
+    print('no')
 
-print(key_max, ': ', my_dict[key_max])
-print('Minimum Value: ',my_dict[key_min])
-
-
-
+isinstance("this is a string", str)
