@@ -139,6 +139,9 @@ for index, row in originalDataFrame.iterrows():
     headerFlagError = False
     bodyFlagError = False
     currentURL = originalDataFrame.at[index, 'URLs']
+    currentLabel = originalDataFrame.at[index, 'Label (1=true)']
+    if currentLabel!='0' and currentLabel!='1':
+        currentLabel='missing label'
     currentHeadLineList = originalDataFrame.at[index, 'Headline']
     currentBodyList = originalDataFrame.at[index, 'Body']
     if ((currentHeadLineList == []) or (not(isinstance(currentHeadLineList, str)))):
@@ -261,6 +264,7 @@ for index, row in originalDataFrame.iterrows():
         articleAttrs['bodyGrammarMaxTimes'] = bodyGrammarMaxTimes
         articleAttrs['bodyGrammarMinKey'] = bodyGrammarMinKey
         articleAttrs['bodyGrammarMinTimes'] = bodyGrammarMinTimes
+        articleAttrs['label'] = currentLabel
 
     else:
         articleAttrs['numOfHeaderSentences'] = 0
@@ -281,6 +285,7 @@ for index, row in originalDataFrame.iterrows():
         articleAttrs['bodyGrammarMaxTimes'] = 0
         articleAttrs['bodyGrammarMinKey'] = 0
         articleAttrs['bodyGrammarMinTimes'] = 0
+        articleAttrs['label'] = 0
 
     initDataPerArticle[currentURL] = articleAttrs
 
@@ -307,6 +312,7 @@ attrsDataFrame['bodyGrammarMaxKey'] = 0
 attrsDataFrame['bodyGrammarMaxTimes'] = 0
 attrsDataFrame['bodyGrammarMinKey'] = 0
 attrsDataFrame['bodyGrammarMinTimes'] = 0
+attrsDataFrame['label'] = 0
 
 count = 0
 for url, attrs in initDataPerArticle.items():
@@ -329,6 +335,7 @@ for url, attrs in initDataPerArticle.items():
     attrsDataFrame.loc[count, 'bodyGrammarMaxTimes'] = attrs['bodyGrammarMaxTimes']
     attrsDataFrame.loc[count, 'bodyGrammarMinKey'] = attrs['bodyGrammarMinKey']
     attrsDataFrame.loc[count, 'bodyGrammarMinTimes'] = attrs['bodyGrammarMinTimes']
+    attrsDataFrame.loc[count, 'label'] = attrs['label']
 
     count = count + 1
 
