@@ -15,15 +15,17 @@ bad_input = all_data.loc[~all_data['Label (1=true)'].isin(['0','1'])]
 print_to_json(bad_input.index.values.tolist(),"bad_input_indexes")
 data = all_data.loc[all_data['Label (1=true)'].isin(['0','1'])]
 print (data.shape)
-artcles_list = data['Body'].values.astype('U').tolist()
-labels = data['Label (1=true)'].values.astype('U').tolist()
-words = read_json("top_50.json")
+
+articles_list = data['Body'].iloc[:500].values.astype('U').tolist()
+labels = data['Label (1=true)'].iloc[:500].values.astype('U').tolist()
+to_bag_of_words(articles_list, labels, "top_50.json.1","words_importance.json.1",200)
+words = read_json("top_50.json.1")
 #to_bag_of_words(artcles_list,labels)
 
 df_with_imp_words = build_table_form_words(data,words)
-X = df_with_imp_words.iloc[:4000,0:50]
+X = df_with_imp_words.iloc[500:3000,:200]
 Y = data['Label (1=true)']
-Y_train = Y.iloc[:4000]
+Y_train = Y.iloc[500:3000]
 
 #fold = KFold(len(Y_train), n_folds=10, shuffle=True, random_state=777)
 #lr = lr_func(X,Y_train)
@@ -33,5 +35,6 @@ Y_train = Y.iloc[:4000]
 # coef_plot(lr,df_with_imp_words)
 
 #manual_check(df_with_imp_words,Y,lr)
-clf = svm_func(X, Y_train)
-coef_plot(clf,df_with_imp_words)
+clf = lr_func(X, Y_train)
+manual_check(df_with_imp_words,Y,clf,200)
+#coef_plot(clf,X)

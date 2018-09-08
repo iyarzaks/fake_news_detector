@@ -8,7 +8,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
 
 
-def to_bag_of_words(articles,labels):
+def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
     # vectorizer = TfidfVectorizer()
     # vectorizer.fit(articles)
     # print(vectorizer.vocabulary_)
@@ -26,13 +26,12 @@ def to_bag_of_words(articles,labels):
                mutual_info_classif(X_train_counts, labels, discrete_features=True)
                ))
     #print (res)
-    print (X_train_counts.shape)
-    print (X_train_counts[:,count_vect.vocabulary_['www']])
+    # print (X_train_counts.shape)
+    # print (X_train_counts[:,count_vect.vocabulary_['www']])
     sorted_d = sorted(res.items(), key=lambda x: -x[1])
-    top_50_words = [k for (k,v) in sorted_d[:50]]
-    print (top_50_words)
-    print_to_json(top_50_words,"top_50.json")
-    print_to_json(sorted_d, "words_importance.json")
+    top_50_words = [k for (k,v) in sorted_d[:num_of_words]]
+    print_to_json(top_50_words,top_50_path)
+    print_to_json(sorted_d, importance_path)
     #print (count_vect.vocabulary_)
     #print(count_vect.vocabulary_.get('algorithm'))
 
@@ -63,16 +62,17 @@ def read_json(name):
         return data
 
 
-def coef_plot(lr,df_with_imp_words):
+def coef_plot(lr,X):
     import matplotlib.pyplot
     coef_list = lr.coef_[0].tolist()
     coef_list = [float(format(a, '.2f')) for a in coef_list]
-    coefs1_series = pd.Series(coef_list, index=list(df_with_imp_words.columns.values)[:50])
-    coefs1_series.sort_values().plot(kind="bar")
+    coefs1_series = pd.Series(coef_list, index=list(X.columns.values))
+    coefs1_series.sort_values().plot(kind="barh")
     matplotlib.pyplot.show()
 
-def manual_check(df_with_imp_words,Y,lr):
-    X_test = df_with_imp_words.iloc[3000:4000,0:50]
+
+def manual_check(df_with_imp_words,Y,lr,num_of_words):
+    X_test = df_with_imp_words.iloc[3000:4000,0:num_of_words]
     Y_test = Y.iloc[3000:4000]
     pairs = zip(lr.predict(X_test),Y_test)
     un_matched_digits = [(idx,pair) for idx, pair in enumerate(pairs) if pair[0] != pair[1]]
