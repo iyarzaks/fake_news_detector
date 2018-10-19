@@ -6,6 +6,7 @@ import re
 from nltk.corpus import brown
 import nltk
 import json
+from copy import deepcopy
 
 import time
 startTime = time.time()
@@ -293,7 +294,9 @@ for index, row in originalDataFrame.iterrows():
 # print(initDataPerArticle)
 
 attrsDataFrame = pd.DataFrame()
-attrsDataFrame['URL'] = 0
+newOrderDF = deepcopy(originalDataFrame)
+
+'''attrsDataFrame['URL'] = 0
 attrsDataFrame['numOfHeaderSentences'] = 0
 attrsDataFrame['numOfBodySentences'] = 0
 attrsDataFrame['meanHeaderLen'] = 0
@@ -312,11 +315,34 @@ attrsDataFrame['bodyGrammarMaxKey'] = 0
 attrsDataFrame['bodyGrammarMaxTimes'] = 0
 attrsDataFrame['bodyGrammarMinKey'] = 0
 attrsDataFrame['bodyGrammarMinTimes'] = 0
-attrsDataFrame['label'] = 0
+attrsDataFrame['label'] = 0'''
+
+
+
+
+newOrderDF['numOfHeaderSentences'] = 0
+newOrderDF['numOfBodySentences'] = 0
+newOrderDF['meanHeaderLen'] = 0
+newOrderDF['minHeaderLength'] = 0
+newOrderDF['maxHeaderLength'] = 0
+newOrderDF['meanBodyLen'] = 0
+newOrderDF['minBodyLength'] = 0
+newOrderDF['maxBodyLength'] = 0
+newOrderDF['headerMisspellRate'] = 0
+newOrderDF['bodyMisspellRate'] = 0
+newOrderDF['headerGrammarMaxKey'] = 0
+newOrderDF['headerGrammarMaxTimes'] = 0
+newOrderDF['headerGrammarMinKey'] = 0
+newOrderDF['headerGrammarMinTimes'] = 0
+newOrderDF['bodyGrammarMaxKey'] = 0
+newOrderDF['bodyGrammarMaxTimes'] = 0
+newOrderDF['bodyGrammarMinKey'] = 0
+newOrderDF['bodyGrammarMinTimes'] = 0
 
 count = 0
+
 for url, attrs in initDataPerArticle.items():
-    attrsDataFrame.loc[count, 'URL'] = url
+    '''attrsDataFrame.loc[count, 'URL'] = url
     attrsDataFrame.loc[count, 'numOfHeaderSentences'] = attrs['numOfHeaderSentences']
     attrsDataFrame.loc[count, 'numOfBodySentences'] = attrs['numOfBodySentences']
     attrsDataFrame.loc[count, 'meanHeaderLen'] = attrs['meanHeaderLen']
@@ -335,11 +361,40 @@ for url, attrs in initDataPerArticle.items():
     attrsDataFrame.loc[count, 'bodyGrammarMaxTimes'] = attrs['bodyGrammarMaxTimes']
     attrsDataFrame.loc[count, 'bodyGrammarMinKey'] = attrs['bodyGrammarMinKey']
     attrsDataFrame.loc[count, 'bodyGrammarMinTimes'] = attrs['bodyGrammarMinTimes']
-    attrsDataFrame.loc[count, 'label'] = attrs['label']
+    attrsDataFrame.loc[count, 'label'] = attrs['label']'''
+
+
+
+
+
+    newOrderDF.loc[count, 'numOfHeaderSentences'] = attrs['numOfHeaderSentences']
+    newOrderDF.loc[count, 'numOfBodySentences'] = attrs['numOfBodySentences']
+    newOrderDF.loc[count, 'meanHeaderLen'] = attrs['meanHeaderLen']
+    newOrderDF.loc[count, 'minHeaderLength'] = attrs['minHeaderLength']
+    newOrderDF.loc[count, 'maxHeaderLength'] = attrs['maxHeaderLength']
+    newOrderDF.loc[count, 'meanBodyLen'] = attrs['meanBodyLen']
+    newOrderDF.loc[count, 'minBodyLength'] = attrs['minBodyLength']
+    newOrderDF.loc[count, 'maxBodyLength'] = attrs['maxBodyLength']
+    newOrderDF.loc[count, 'headerMisspellRate'] = attrs['headerMisspellRate']
+    newOrderDF.loc[count, 'bodyMisspellRate'] = attrs['bodyMisspellRate']
+    newOrderDF.loc[count, 'headerGrammarMaxKey'] = attrs['headerGrammarMaxKey']
+    newOrderDF.loc[count, 'headerGrammarMaxTimes'] = attrs['headerGrammarMaxTimes']
+    newOrderDF.loc[count, 'headerGrammarMinKey'] = attrs['headerGrammarMinKey']
+    newOrderDF.loc[count, 'headerGrammarMinTimes'] = attrs['headerGrammarMinTimes']
+    newOrderDF.loc[count, 'bodyGrammarMaxKey'] = attrs['bodyGrammarMaxKey']
+    newOrderDF.loc[count, 'bodyGrammarMaxTimes'] = attrs['bodyGrammarMaxTimes']
+    newOrderDF.loc[count, 'bodyGrammarMinKey'] = attrs['bodyGrammarMinKey']
+    newOrderDF.loc[count, 'bodyGrammarMinTimes'] = attrs['bodyGrammarMinTimes']
+
 
     count = count + 1
 
-attrsDataFrame.to_csv('initDataPerArticle.csv', encoding='utf-8', index=False)
+# attrsDataFrame.to_csv('initDataPerArticle.csv', encoding='utf-8', index=False) # the old name of the csv file
+newOrderDF = newOrderDF.drop('Unnamed: 4', 1)
+newOrderDF = newOrderDF.drop('Unnamed: 5', 1)
+x=0
+newOrderDF.to_csv('newOrderAlonParams.csv', encoding='utf-8', index=False)
+
 import time
 print('finish: ', time.time() - startTime )
 
