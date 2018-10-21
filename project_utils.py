@@ -37,6 +37,7 @@ def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
 
 
 def build_table_form_words(data,words):
+    data.rename(index=str, columns={"text": "Body"})
     articles_list = data['Body'].values.astype('U').tolist()
     count_vect = CountVectorizer(max_df=0.95, min_df=2,
                                  max_features=50000,
@@ -44,7 +45,9 @@ def build_table_form_words(data,words):
     dtm = count_vect.fit_transform(articles_list)
     df = pd.DataFrame(dtm.toarray(), columns=count_vect.get_feature_names())
     df = pd.DataFrame (df ,columns=words)
-    result = pd.concat([df, data], axis =1)
+    df.index = range(len(df))
+    data.index = range(len(df))
+    result = pd.concat([df, data],axis=1)
     return result
 
 
@@ -72,10 +75,11 @@ def coef_plot(lr,X):
 
 
 def manual_check(df_with_imp_words,Y,lr,num_of_words):
-    X_test = df_with_imp_words.iloc[3000:4000,0:num_of_words]
-    Y_test = Y.iloc[3000:4000]
+    X_test = df_with_imp_words.iloc[:,0:num_of_words]
+    Y_test = Y.iloc[:]
+    #print (X_test.to_dict('records'))
     pairs = zip(lr.predict(X_test),Y_test)
-    un_matched_digits = [(idx,pair) for idx, pair in enumerate(pairs) if pair[0] != pair[1]]
+    un_matched_digits = [(idx,pair) for idx, pair in enumerate(pairs) if pair[0]!=str(int(pair[1]))]
     print (un_matched_digits)
     print (1-len(un_matched_digits)/len(Y_test))
 
