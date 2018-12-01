@@ -14,7 +14,7 @@ os.environ["PATH"] += 'C:/Users/win7/AppData/Local/Programs/Python\Python36-32/L
 
 def flow():
     #all_data = pd.read_csv('fake_or_real_news.csv', engine='python',usecols=["URLs","Headline","Body","Label (1=true)","numOfHeaderSentences","meanHeaderLen","headerMisspellRate"])
-    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python')
+    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows =3000)
     print (all_data.shape)
     # all_data_csv_2 = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows=2000)
     all_data = all_data.replace("FAKE", '0')
