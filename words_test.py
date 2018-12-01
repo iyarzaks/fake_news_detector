@@ -15,7 +15,7 @@ os.environ["PATH"] += 'C:/Users/win7/AppData/Local/Programs/Python\Python36-32/L
 
 def flow():
     #all_data = pd.read_csv('fake_or_real_news.csv', engine='python',usecols=["URLs","Headline","Body","Label (1=true)","numOfHeaderSentences","meanHeaderLen","headerMisspellRate"])
-    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows =3000)
+    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows =3500)
     print (all_data.shape)
     # all_data_csv_2 = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows=2000)
     all_data = all_data.replace("FAKE", '0')
@@ -28,13 +28,13 @@ def flow():
     print_to_json(bad_input.index.values.tolist(),"bad_input_indexes")
     data = all_data.loc[all_data['Label (1=true)'].isin(['0','1'])]
     print (data.shape)
-    # articles_list = data['Body'].values.astype('U').tolist()
-    # labels = data['Label (1=true)'].values.astype('U').tolist()
-    # to_bag_of_words(articles_list, labels, "top_50.tfidf.json","words_importance.tfidf.json",1000)
+    articles_list = data['Body'].values.astype('U').tolist()
+    labels = data['Label (1=true)'].values.astype('U').tolist()
+    to_bag_of_words(articles_list, labels, "top_50.json.1","words_importance.json.1",1000)
     words = read_json("top_50.json.1")
     #words_tf_idf = read_json("top_50.tfidf.json")
     #to_bag_of_words(artcles_list,labels)
-    words = words[:100]
+    words = words[:500]
     #words_tf_idf = words_tf_idf[:100]
     #df_with_imp_words_tf_idf = build_table_form_words(data, words_tf_idf,option="tf_idf")
     df_with_imp_words = build_table_form_words(data,words)
@@ -53,10 +53,19 @@ def flow():
     # coef_plot(lr,df_with_imp_words)
 
     #manual_check(df_with_imp_words,Y,lr)
-    clf = nn_func(X, Y_train)
+    nn_clf = nn_func(X, Y_train)
+    svm_clf = svm_func(X, Y_train)
+    lr_clf = lr_func(X, Y_train)
+    dec_tree_clf = dec_tree_func(X, Y_train)
+    r_forest_clf = r_forest(X,Y_train)
+
     #coef_plot(clf, X)
     # save the classifier
-    joblib.dump(clf, 'nn_clf.pkl')
+    joblib.dump(nn_clf, 'nn_clf.pkl')
+    joblib.dump(svm_clf, 'svm_clf.pkl')
+    joblib.dump(lr_clf, 'lr_clf.pkl')
+    joblib.dump(dec_tree_clf, 'dec_tree_clf.pkl')
+    joblib.dump(r_forest_clf, 'r_forest_clf.pkl')
 
 # load it again
 # clf_from_file = joblib.load('lr_clf.pkl')
@@ -64,7 +73,8 @@ def flow():
 #coef_plot(clf,X)
 
 def check_new_df():
-    clf_from_file = joblib.load('nn_clf.pkl')
+    nn_clf_from_file = joblib.load('nn_clf.pkl')
+    lr_clf_from_file = joblib.load('nn_clf.pkl')
     test_df = pd.read_csv('Classified_Data_kaggle.csv', engine='python', skiprows=list(range(1,3000)),nrows=1000)
     test_df = test_df.replace("FAKE", '0')
     test_df = test_df.replace("REAL", '1')
@@ -79,12 +89,12 @@ def check_new_df():
     #df_with_imp_words = df_with_imp_words.iloc[0:1000,:]
     Y = df_with_imp_words['Label (1=true)']
     #print (Y)
-    manual_check(df_with_imp_words, Y, clf_from_file, 100)
+    manual_check(df_with_imp_words, Y, nn_clf_from_file, 100)
 
 
 def main():
-    #flow()
-    check_new_df()
+    flow()
+    #check_new_df()
 
 if __name__ == "__main__":
     main()
