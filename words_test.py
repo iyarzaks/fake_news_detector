@@ -15,7 +15,7 @@ os.environ["PATH"] += 'C:/Users/win7/AppData/Local/Programs/Python\Python36-32/L
 
 def flow():
     #all_data = pd.read_csv('fake_or_real_news.csv', engine='python',usecols=["URLs","Headline","Body","Label (1=true)","numOfHeaderSentences","meanHeaderLen","headerMisspellRate"])
-    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows =3500)
+    all_data = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows =4000)
     print (all_data.shape)
     # all_data_csv_2 = pd.read_csv('Classified_Data_kaggle.csv', engine='python',nrows=2000)
     all_data = all_data.replace("FAKE", '0')
@@ -28,9 +28,9 @@ def flow():
     print_to_json(bad_input.index.values.tolist(),"bad_input_indexes")
     data = all_data.loc[all_data['Label (1=true)'].isin(['0','1'])]
     print (data.shape)
-    articles_list = data['Body'].values.astype('U').tolist()
-    labels = data['Label (1=true)'].values.astype('U').tolist()
-    to_bag_of_words(articles_list, labels, "top_50.json.1","words_importance.json.1",1000)
+    # articles_list = data['Body'].values.astype('U').tolist()
+    # labels = data['Label (1=true)'].values.astype('U').tolist()
+    # to_bag_of_words(articles_list, labels, "top_50.json.1","words_importance.json.1",500)
     words = read_json("top_50.json.1")
     #words_tf_idf = read_json("top_50.tfidf.json")
     #to_bag_of_words(artcles_list,labels)
@@ -54,7 +54,7 @@ def flow():
 
     #manual_check(df_with_imp_words,Y,lr)
     nn_clf = nn_func(X, Y_train)
-    svm_clf = svm_func(X, Y_train)
+    adaboost_clf = adaboost(X, Y_train)
     lr_clf = lr_func(X, Y_train)
     dec_tree_clf = dec_tree_func(X, Y_train)
     r_forest_clf = r_forest(X,Y_train)
@@ -62,7 +62,7 @@ def flow():
     #coef_plot(clf, X)
     # save the classifier
     joblib.dump(nn_clf, 'nn_clf.pkl')
-    joblib.dump(svm_clf, 'svm_clf.pkl')
+    joblib.dump(adaboost_clf, 'adaboost_clf.pkl')
     joblib.dump(lr_clf, 'lr_clf.pkl')
     joblib.dump(dec_tree_clf, 'dec_tree_clf.pkl')
     joblib.dump(r_forest_clf, 'r_forest_clf.pkl')
