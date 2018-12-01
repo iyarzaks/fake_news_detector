@@ -102,10 +102,8 @@ def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
 
 
 def build_table_form_words(data,words,option="r"):
-    data.rename(index=str, columns={"text": "Body"})
     articles_list = data['Body'].values.astype('U').tolist()
-    count_vect = CountVectorizer(max_df=0.95, min_df=2,
-                                     max_features=50000,
+    count_vect = CountVectorizer(max_features=50000,
                                      stop_words='english')
     dtm = count_vect.fit_transform(articles_list)
     if option == "tf_idf":
@@ -163,6 +161,11 @@ def nn_func(X,Y):
     #mean_scores = np.mean(scores, axis=0)
 
 
+def r_forest(X,Y):
+    clf = RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)
+    clf = clf.fit(X, Y)
+    return clf
+
 
 def lr_func(X,Y):
     lr = LogisticRegressionCV(Cs=10
@@ -180,6 +183,7 @@ def lr_func(X,Y):
     return lr
     #scores = lr.scores_['1']
     #mean_scores = np.mean(scores, axis=0)
+
 
 def svm_func(X, Y_train):
     clf = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
