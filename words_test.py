@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from project_utils import *
 from sklearn import linear_model, datasets
@@ -31,18 +32,18 @@ def flow():
     # labels = data['Label (1=true)'].values.astype('U').tolist()
     # to_bag_of_words(articles_list, labels, "top_50.tfidf.json","words_importance.tfidf.json",1000)
     words = read_json("top_50.json.1")
-    words_tf_idf = read_json("top_50.tfidf.json")
+    #words_tf_idf = read_json("top_50.tfidf.json")
     #to_bag_of_words(artcles_list,labels)
     words = words[:100]
-    words_tf_idf = words_tf_idf[:100]
-    df_with_imp_words_tf_idf = build_table_form_words(data, words_tf_idf,option="tf_idf")
+    #words_tf_idf = words_tf_idf[:100]
+    #df_with_imp_words_tf_idf = build_table_form_words(data, words_tf_idf,option="tf_idf")
     df_with_imp_words = build_table_form_words(data,words)
     df_with_imp_words = df_with_imp_words.replace(np.nan, 0)
-    df_with_imp_words_tf_idf = df_with_imp_words_tf_idf.replace(np.nan, 0)
+    #df_with_imp_words_tf_idf = df_with_imp_words_tf_idf.replace(np.nan, 0)
     X = df_with_imp_words.iloc[:,6:]
-    X_tdf = df_with_imp_words_tf_idf.iloc[:,6:]
-    Y_train = df_with_imp_words_tf_idf['Label (1=true)']
-    Y_tdf = df_with_imp_words_tf_idf['Label (1=true)']
+    #X_tdf = df_with_imp_words_tf_idf.iloc[:,6:]
+    Y_train = df_with_imp_words['Label (1=true)']
+    #Y_tdf = df_with_imp_words_tf_idf['Label (1=true)']
 
     #fold = KFold(len(Y_train), n_folds=10, shuffle=True, random_state=777)
     #lr = lr_func(X,Y_train)
