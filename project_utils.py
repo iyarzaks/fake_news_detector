@@ -1,8 +1,11 @@
+import os
+import numpy as np
 import pandas as pd
 import json
+import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
 from sklearn.feature_selection import mutual_info_classif
-import numpy as np
+
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
@@ -103,11 +106,12 @@ def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
 
 def build_table_form_words(data,words,option="r"):
     articles_list = data['Body'].values.astype('U').tolist()
-    count_vect = CountVectorizer(max_features=50000, stop_words='english')
+    count_vect = CountVectorizer(max_features=50000,max_df=0.95, min_df=2, stop_words='english', vocabulary=words)
     dtm = count_vect.fit_transform(articles_list)
     if option == "tf_idf":
         tfidf_transformer = TfidfTransformer()
         dtm = tfidf_transformer.fit_transform(dtm)
+
     df = pd.DataFrame(dtm.toarray(), columns=count_vect.get_feature_names())
     df = pd.DataFrame (df ,columns=words)
     df.index = range(len(df))
@@ -159,6 +163,12 @@ def nn_func(X,Y):
     #scores = lr.scores_['1']
     #mean_scores = np.mean(scores, axis=0)
 
+def KNeighbors(X,Y):
+    clf = KNeighborsClassifier(6,probality = True)
+    clf = clf.fit(X, Y)
+    return clf
+
+
 
 def adaboost(X,Y):
     clf = AdaBoostClassifier()
@@ -191,9 +201,9 @@ def lr_func(X,Y):
 
 def svm_func(X, Y_train):
     clf = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
-        decision_function_shape='ovr', degree=3, gamma='auto', kernel='linear',
-        max_iter=-1, probability=False, random_state=None, shrinking=True,
-        tol=0.001, verbose=False)
+        decision_function_shape='ovr', degree=3, gamma='auto',
+        max_iter = 2000, random_state=None, shrinking=True,
+        tol=0.001, verbose=False,probability = True)
     clf.fit(X, Y_train)
     scores = cross_val_score(clf, X, Y_train, cv=10)
     print (np.mean(scores))

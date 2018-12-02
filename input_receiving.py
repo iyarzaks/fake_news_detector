@@ -77,7 +77,3 @@ def convertUrlToDF(inputURL):
 
 
 
-myUrl = "http://www.bbc.com/news/world-us-canada-41419190"
-# myUrl = 'http://www.sport5.co.il/'
-myDF = convertUrlToDF(myUrl)
-print(myDF)
