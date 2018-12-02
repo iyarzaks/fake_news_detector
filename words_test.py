@@ -56,7 +56,7 @@ def flow():
     nn_clf = nn_func(X, Y_train)
     # adaboost_clf = adaboost(X, Y_train)
     lr_clf = lr_func(X, Y_train)
-    svm_clf = svm_func(X,Y_train)
+    # svm_clf = svm_func(X,Y_train)
     KNeighbors_clf = KNeighbors(X,Y_train)
 
     # dec_tree_clf = dec_tree_func(X, Y_train)
@@ -67,7 +67,6 @@ def flow():
     joblib.dump(KNeighbors_clf, 'KNeighbors_clf.pkl')
     joblib.dump(nn_clf, 'nn_clf.pkl')
     # joblib.dump(adaboost_clf, 'adaboost_clf.pkl')
-    joblib.dump(svm_clf, 'svm_clf.pkl')
     joblib.dump(lr_clf, 'lr_clf.pkl')
     # joblib.dump(dec_tree_clf, 'dec_tree_clf.pkl')
     # joblib.dump(r_forest_clf, 'r_forest_clf.pkl')

@@ -159,13 +159,17 @@ def nn_func(X,Y):
                   random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
                   early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     clf = clf.fit(X, Y)
+    scores = cross_val_score(clf, X, Y, cv=10,n_jobs=-1)
+    print(np.mean(scores))
     return clf
     #scores = lr.scores_['1']
     #mean_scores = np.mean(scores, axis=0)
 
 def KNeighbors(X,Y):
-    clf = KNeighborsClassifier(6,probality = True)
+    clf = KNeighborsClassifier(6)
     clf = clf.fit(X, Y)
+    scores = cross_val_score(clf, X, Y, cv=10,n_jobs=-1)
+    print(np.mean(scores))
     return clf
 
 
@@ -191,6 +195,7 @@ def lr_func(X,Y):
             ,fit_intercept=True
             ,solver='newton-cg'
             ,tol=10
+            , n_jobs=-1
         )
     lr = lr.fit(X, Y)
     print ('Max auc:', lr.scores_['1'].mean(axis=0).max())
@@ -202,7 +207,7 @@ def lr_func(X,Y):
 def svm_func(X, Y_train):
     clf = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
         decision_function_shape='ovr', degree=3, gamma='auto',
-        max_iter = 2000, random_state=None, shrinking=True,
+        max_iter = 100, random_state=None, shrinking=True,
         tol=0.001, verbose=False,probability = True)
     clf.fit(X, Y_train)
     scores = cross_val_score(clf, X, Y_train, cv=10)
