@@ -103,8 +103,7 @@ def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
 
 def build_table_form_words(data,words,option="r"):
     articles_list = data['Body'].values.astype('U').tolist()
-    count_vect = CountVectorizer(max_features=50000,
-                                     stop_words='english')
+    count_vect = CountVectorizer(max_features=50000, stop_words='english')
     dtm = count_vect.fit_transform(articles_list)
     if option == "tf_idf":
         tfidf_transformer = TfidfTransformer()
@@ -160,6 +159,11 @@ def nn_func(X,Y):
     #scores = lr.scores_['1']
     #mean_scores = np.mean(scores, axis=0)
 
+
+def adaboost(X,Y):
+    clf = AdaBoostClassifier()
+    clf = clf.fit(X, Y)
+    return clf
 
 def r_forest(X,Y):
     clf = RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)
