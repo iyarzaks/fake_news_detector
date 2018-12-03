@@ -59,7 +59,7 @@ server = 'iz.database.windows.net'
 database = 'fake_news_DB'
 username = 'izaks'
 password = 'Fakenews!'
-driver= '{SQL Server}'
+driver= '{ODBC Driver 13 for SQL Server}'
 cnxn = pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password)
 cursor = cnxn.cursor()
 cursor.execute("SELECT * FROM Article")
@@ -69,8 +69,23 @@ while row:
     row = cursor.fetchone()
 
 
+'''cursor.execute("SELECT domain FROM (SELECT top 2 domain,COUNT(domain) AS domainCount FROM ARTICLE GROUP BY domain ORDER BY domainCount DESC) ARTICLE_COUNT")
+row = cursor.fetchone()
+while row:
+    print (str(row[0]))
+    row = cursor.fetchone()'''
+
+cursor.execute("INSERT INTO ARTICLE (aID, URL, header, modelResult, domain, alg1, alg2, alg3, modelWeightedResult) VALUES (8, 'www.dofan.co.il/tamar', 'tamar queen', 1, 'dofan', 0.6, 0.7, 0.8, 0.7)")
 
 
+# ['SQL Server', 'SQL Server Native Client 11.0', 'SQL Server Native Client RDA 11.0', 'ODBC Driver 13 for SQL Server']
 
+
+# x = pyodbc.drivers()
+# print(x)
+
+
+INSERT INTO ARTICLE (aID, URL, header, modelResult, domain, alg1, alg2, alg3, modelWeightedResult)
+VALUES (7, 'www.dofan.co.il/alon', 'alon king', 1, 'dofan', 0.6, 0.7, 0.8, 0.7);
 
 
