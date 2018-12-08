@@ -1,0 +1,7 @@
+{
+  "server" : "tamarp.database.windows.net",
+    "database" : "fake_news_DB",
+    "username" : "tperetz",
+    "password" : "Fakenews!",
+    "driver" : "{SQL Server}"
+}

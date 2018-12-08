@@ -12,11 +12,8 @@ import requests
 
 
 def convertUrlToDF(inputURL):
-    # create an empty df we want to fill
-    singleInputDF = pd.DataFrame()
-    singleInputDF.loc[0, 'URLs'] = inputURL
-    singleInputDF['HeadLine'] = 0
-    singleInputDF['Body'] = 0
+    singleInputDict = {}
+    singleInputDict['URLs'] = inputURL
 
     gooseErrorFlag = False  # flag stating if the goose article was successfully extracted.
 
@@ -53,27 +50,28 @@ def convertUrlToDF(inputURL):
                 gooseBody = gooseArticle.cleaned_text
 
             # fill in our df with one of the libraries parameters, newspaper is chosen here arbitrary.
-            singleInputDF.loc[0, 'HeadLine'] = newspaperHeadLine
-            singleInputDF.loc[0, 'Body'] = newspaperBody
 
+            singleInputDict['HeadLine'] = newspaperHeadLine
+            singleInputDict['Body'] = newspaperBody
             # following 2 IFs: if one of the parameters is empty or None, replace it with the relevant data from the second
             # library, as it might have better content.
-            if ( (singleInputDF.loc[0, 'HeadLine'] == None) or (singleInputDF.loc[0, 'HeadLine'] == '') or (singleInputDF.loc[0, 'HeadLine'] == 0) ):
-                singleInputDF.loc[0, 'HeadLine'] = gooseHeadLine
+            if ( (singleInputDict['HeadLine'] == None) or (singleInputDict['HeadLine'] == '') or (singleInputDict['HeadLine'] == 0) ):
+                singleInputDict['HeadLine'] = gooseHeadLine
 
-            if ((singleInputDF.loc[0, 'Body'] == None) or (singleInputDF.loc[0, 'Body'] == '')  or (singleInputDF.loc[0, 'Body'] == 0) ):
-                singleInputDF.loc[0, 'Body'] = gooseBody
+            if ((singleInputDict['Body'] == None) or (singleInputDict['Body'] == '')  or (singleInputDict['Body'] == 0) ):
+                singleInputDict['Body'] = gooseBody
 
             # check if input is valid: if any body AND header extracted at all
-            if ((singleInputDF.loc[0, 'HeadLine'] == None) or (singleInputDF.loc[0, 'HeadLine'] == '')  or (singleInputDF.loc[0, 'HeadLine'] == 0) ):
+            if ((singleInputDict['HeadLine'] == None) or (singleInputDict['HeadLine'] == '')  or (singleInputDict['HeadLine'] == 0) ):
                 return 'input error'
-            if ((singleInputDF.loc[0, 'Body'] == None) or (singleInputDF.loc[0, 'Body'] == '')  or (singleInputDF.loc[0, 'Body'] == 0) ):
+            if ((singleInputDict['Body'] == None) or (singleInputDict['Body'] == '')  or (singleInputDict['Body'] == 0) ):
                 return 'input error'
+            df = pd.DataFrame()
+            df.loc[0, 'URLs'] = singleInputDict['URLs']
+            df.loc[0, 'HeadLine'] = singleInputDict['HeadLine']
+            df.loc[0, 'Body'] = singleInputDict['Body']
+            return df
 
-            return singleInputDF
 
     except Exception as inputError: # trying request for url wasn't successful - input error
         return 'input error'
-
-
-

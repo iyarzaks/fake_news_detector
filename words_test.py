@@ -53,21 +53,22 @@ def flow():
     # coef_plot(lr,df_with_imp_words)
 
     #manual_check(df_with_imp_words,Y,lr)
-    nn_clf = nn_func(X, Y_train)
+    #nn_clf = nn_func(X, Y_train)
     # adaboost_clf = adaboost(X, Y_train)
-    lr_clf = lr_func(X, Y_train)
-    # svm_clf = svm_func(X,Y_train)
-    KNeighbors_clf = KNeighbors(X,Y_train)
+    #lr_clf = lr_func(X, Y_train)
+    svm_clf = svm_func(X,Y_train)
+    #KNeighbors_clf = KNeighbors(X,Y_train)
 
     # dec_tree_clf = dec_tree_func(X, Y_train)
     # r_forest_clf = r_forest(X,Y_train)
 
     #coef_plot(clf, X)
     # save the classifier
-    joblib.dump(KNeighbors_clf, 'KNeighbors_clf.pkl')
-    joblib.dump(nn_clf, 'nn_clf.pkl')
+    #joblib.dump(KNeighbors_clf, 'KNeighbors_clf.pkl')
+    joblib.dump(svm_clf, 'svm_clf.pkl')
+    #joblib.dump(nn_clf, 'nn_clf.pkl')
     # joblib.dump(adaboost_clf, 'adaboost_clf.pkl')
-    joblib.dump(lr_clf, 'lr_clf.pkl')
+    #joblib.dump(lr_clf, 'lr_clf.pkl')
     # joblib.dump(dec_tree_clf, 'dec_tree_clf.pkl')
     # joblib.dump(r_forest_clf, 'r_forest_clf.pkl')
 

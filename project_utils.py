@@ -27,6 +27,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.model_selection import KFold
+import pyodbc
 
 def compare_clfs(X,Y,X_TDF,Y_TDF):
     names = ["Nearest Neighbors", "Linear SVM", "RBF SVM",
@@ -207,10 +208,10 @@ def lr_func(X,Y):
 def svm_func(X, Y_train):
     clf = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
         decision_function_shape='ovr', degree=3, gamma='auto',
-        max_iter = 100, random_state=None, shrinking=True,
-        tol=0.001, verbose=False,probability = True)
+        max_iter = -1, random_state=777, shrinking=True,
+        tol=0.02, verbose=False,probability = True)
     clf.fit(X, Y_train)
-    scores = cross_val_score(clf, X, Y_train, cv=10)
+    scores = cross_val_score(clf, X, Y_train, cv=10,n_jobs=-1)
     print (np.mean(scores))
     return clf
 
@@ -225,3 +226,17 @@ def dec_tree_func(X, Y_train):
     #graph.draw('file.png')
     #graph.write_png('tree.png')
     return clf
+
+
+def connect_sql_server():
+    with open ("sql_config.json","r") as f:
+        config = json.load(f)
+    server = config["server"]
+    database = config["database"]
+    username = config["username"]
+    password = config["password"]
+    driver = config["driver"]
+    cnxn = pyodbc.connect(
+        'DRIVER=' + driver + ';SERVER=' + server + ';PORT=1433;DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
+    cursor = cnxn.cursor()
+    return cursor,cnxn
