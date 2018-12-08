@@ -11,6 +11,7 @@ import time
 import datetime
 
 
+"""class for runing queries from the front end using threading."""
 
 class client(Thread):
     def __init__(self, socket, address,cursor,cnxn):
@@ -42,6 +43,11 @@ class client(Thread):
         # print('Client sent:', self.sock.recv(1024).decode())
         # self.sock.send('Oi you sent something to me')
 
+
+"""get the probabilities for the article to be true 
+using the learning models"""
+
+
 def get_results(df_with_imp_words,clfs_dic):
     X_test = df_with_imp_words.iloc[:, 3:]
     #print (X_test.values)
@@ -56,6 +62,10 @@ def get_results(df_with_imp_words,clfs_dic):
     return result
 
 
+"""load classifiers to use for predict truth probability of
+an article."""
+
+
 def check_new_article(test_df):
     clfs_dic ={}
     clfs_dic["nn_clf_from_file"]= joblib.load('nn_clf.pkl')
@@ -68,6 +78,9 @@ def check_new_article(test_df):
     return get_results(df_with_imp_words,clfs_dic)
 
 
+"""manage front end query. input - url address , output -probabilities """
+
+
 def url_query(url, cursor,cnxn):
     aritcle_csv = convertUrlToDF(url)
     if type(aritcle_csv) == type("alon"):
@@ -75,6 +88,9 @@ def url_query(url, cursor,cnxn):
     res = check_new_article(aritcle_csv)
     add_to_db(cursor,url,res,str(aritcle_csv.loc[0,"HeadLine"]),cnxn)
     return str(res)
+
+
+"""check if url already exist in DB"""
 
 
 def check_url_in_db(url,cursor,cnxn):
@@ -93,12 +109,19 @@ def check_url_in_db(url,cursor,cnxn):
         return 1
     return int(str(row[0]))+1
 
+
+"""add new article to log table in the DB"""
+
+
 def add_article_to_log(aid,cursor,cnxn):
     cur_time = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     query = """INSERT INTO HISTORICAL_INFO (time, HIST_aID)
             VALUES ( '{}', {});""".format(cur_time, aid)
     cursor.execute(query)
     cnxn.commit()
+
+
+"""add new article to the aricles table in the DB"""
 
 
 def add_to_db(cursor,url,res,headline,cnxn):
@@ -117,6 +140,10 @@ def add_to_db(cursor,url,res,headline,cnxn):
     # while row:
     #     print(str(row[0]) + " " + str(row[1]))
     #     row = cursor.fetchone()
+
+
+"""mange sql queries sent from the app"""
+
 
 def sql_response(sql_str,cursor,cnxn):
     if sql_str == "top_n_articles_today":

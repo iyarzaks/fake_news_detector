@@ -28,6 +28,9 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.model_selection import KFold
 import pyodbc
+from sklearn.externals import joblib
+"""function to compare between different well known classifiers. """
+
 
 def compare_clfs(X,Y,X_TDF,Y_TDF):
     names = ["Nearest Neighbors", "Linear SVM", "RBF SVM",
@@ -74,15 +77,12 @@ def compare_clfs(X,Y,X_TDF,Y_TDF):
     matplotlib.pyplot.show()
 
 
+"""get list of articles and labels and create json file
+ of n most important words using mutual_info function"""
+
 
 def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
-    # vectorizer = TfidfVectorizer()
-    # vectorizer.fit(articles)
-    # print(vectorizer.vocabulary_)
-    # print(vectorizer.idf_)
-    # vector = vectorizer.transform([articles[0]])
-    # print(vector.shape)
-    # print(vector.toarray())
+
     categories = [0, 1]
 
     count_vect = CountVectorizer(max_df=0.95, min_df=2,
@@ -103,6 +103,10 @@ def to_bag_of_words(articles,labels,top_50_path,importance_path,num_of_words):
     print_to_json(sorted_d, importance_path)
     #print (count_vect.vocabulary_)
     #print(count_vect.vocabulary_.get('algorithm'))
+
+
+"""get articles and the list of important words and create matrix of
+bag of words representation """
 
 
 def build_table_form_words(data,words,option="r"):
@@ -135,6 +139,9 @@ def read_json(name):
         return data
 
 
+"""make visual presentation of confections matrix"""
+
+
 def coef_plot(lr,X):
     import matplotlib.pyplot
     coef_list = lr.coef_[0].tolist()
@@ -142,6 +149,9 @@ def coef_plot(lr,X):
     coefs1_series = pd.Series(coef_list, index=list(X.columns.values))
     coefs1_series.sort_values().plot(kind="barh")
     matplotlib.pyplot.show()
+
+
+"""use to check success rates of classifier"""
 
 
 def manual_check(df_with_imp_words,Y,lr,num_of_words):
@@ -152,6 +162,10 @@ def manual_check(df_with_imp_words,Y,lr,num_of_words):
     un_matched_digits = [(idx,pair) for idx, pair in enumerate(pairs) if pair[0]!=str(int(pair[1]))]
     print (un_matched_digits)
     print (1-len(un_matched_digits)/len(Y_test))
+
+
+"""all of the below is functions to create classifiers using 
+sklearn functionality."""
 
 
 def nn_func(X,Y):
@@ -226,6 +240,9 @@ def dec_tree_func(X, Y_train):
     #graph.draw('file.png')
     #graph.write_png('tree.png')
     return clf
+
+
+"""connecting to sql server"""
 
 
 def connect_sql_server():

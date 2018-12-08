@@ -25,6 +25,11 @@ q3 = """create table EXTROVERTED_WORD(
     totalCount int
 );"""
 
+
+""" connect to sql server and build three basic tables in it. 
+use when new sql server is configured"""
+
+
 cursor, cnxn = connect_sql_server()
 cursor.execute(q1)
 cursor.execute(q2)
