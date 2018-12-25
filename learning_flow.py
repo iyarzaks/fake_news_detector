@@ -15,7 +15,7 @@ def flow():
     print(data.shape)
     words = read_json("top_1000_imp_words.json")
     words = words[:1000]
-    df_with_imp_words = build_table_form_words(data,words)
+    df_with_imp_words = build_table_form_words(data, words)
     df_with_imp_words = df_with_imp_words.replace(np.nan, 0)
     X = df_with_imp_words.iloc[:,6:]
     Y_train = df_with_imp_words['Label (1=true)']
