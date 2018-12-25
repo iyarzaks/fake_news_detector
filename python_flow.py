@@ -14,7 +14,7 @@ import datetime
 """class for runing queries from the front end using threading."""
 
 class client(Thread):
-    def __init__(self, socket, address,cursor,cnxn):
+    def __init__(self, socket, address,cursor='',cnxn=''):
         Thread.__init__(self)
         self.sock = socket
         self.addr = address
@@ -28,18 +28,22 @@ class client(Thread):
             if "url-" in rcvdData:
                 url = str(rcvdData)[4:]
                 print ("got it:" + url)
-                result = url_query(url,self.cursor,self.cnxn)
-            elif "sql-"in rcvdData:
+                result = url_query(url, self.cursor, self.cnxn)
+                print (result)
+            elif "sql-" in rcvdData:
                 sql_str = str(rcvdData)[4:]
                 print("got it:" + sql_str)
-                result = sql_response(sql_str,self.cursor,self.cnxn)
+                result = sql_response(sql_str, self.cursor, self.cnxn)
             else:
+                result = "err"
                 print (rcvdData)
             try:
                 self.sock.send(result.encode())
-                print ("send back: "+result)
+                print ("send back: " + result)
             except:
                 print ("can not send response")
+            self.sock.close()
+            break
         # print('Client sent:', self.sock.recv(1024).decode())
         # self.sock.send('Oi you sent something to me')
 
@@ -53,13 +57,23 @@ def get_results(df_with_imp_words,clfs_dic):
     #print (X_test.values)
     result ={}
     for clf in clfs_dic:
-        result[clf] = clfs_dic[clf].predict_proba(X_test)[0][1]
-        result[clf] = float(round(result[clf]*100,2))
-        # except:
-        #     print (clf + " can't return probability")
-    #print (result)
-    result = list(result.values())
-    return result
+        result[clf] = {}
+        result[clf]["score"] = clfs_dic[clf].predict_proba(X_test)[0][1]
+        result[clf]["score"] = float(round(result[clf]["score"]*100,2))
+        if result[clf]["score"] < 40.0:
+            result[clf]["weight"] = 2
+        else:
+            result[clf]["weight"] = 1
+    tot_avg = 0
+    total_weight = 0
+    results = []
+    for clf in result:
+        tot_avg += result[clf]["score"] * result[clf]["weight"]
+        total_weight += result[clf]["weight"]
+        results.append(result[clf]["score"])
+    avg = round(tot_avg/total_weight, 2)
+    results.append(avg)
+    return results
 
 
 """load classifiers to use for predict truth probability of
@@ -71,7 +85,7 @@ def check_new_article(test_df):
     clfs_dic["nn_clf_from_file"]= joblib.load('nn_clf.pkl')
     clfs_dic["lr_clf_from_file"] = joblib.load('lr_clf.pkl')
     clfs_dic["svm_clf_from_file"] = joblib.load('svm_clf.pkl')
-    words = read_json("top_50.json.1")
+    words = read_json("top_1000_imp_words.json")
     words = words[:1000]
     df_with_imp_words = build_table_form_words(test_df, words)
     df_with_imp_words = df_with_imp_words.replace(np.nan, 0)
@@ -84,10 +98,10 @@ def check_new_article(test_df):
 def url_query(url, cursor,cnxn):
     aritcle_csv = convertUrlToDF(url)
     if type(aritcle_csv) == type("alon"):
-        return "input error"
+        return "err"
     res = check_new_article(aritcle_csv)
     add_to_db(cursor,url,res,str(aritcle_csv.loc[0,"HeadLine"]),cnxn)
-    return str(res)
+    return str(res).replace("[","").replace("]","").replace(" ","")
 
 
 """check if url already exist in DB"""
@@ -166,23 +180,18 @@ def sql_response(sql_str,cursor,cnxn):
     while row:
         result .append(str(row[0]))
         row = cursor.fetchone()
-    return str(result)
-
+    return str(result).replace("[","").replace("]","").replace("'","").replace(",",";")
 
 
 def main():
-    cursor,cnxn = connect_sql_server()
-    print(url_query("https://alternative-science.com/elon-musk-facebook/",cursor,cnxn))
-    print(sql_response("top_n_sites",cursor,cnxn))
-    # serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # serversocket.bind(("132.69.194.143", 50000))
-    # serversocket.listen(5)
-    # print ("i listening")
-    # while 1:
-    #     clientsocket, address = serversocket.accept()
-    #     client(clientsocket, address,cursor,cnxn)
-
-
+    cursor, cnxn = connect_sql_server()
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serversocket.bind(("132.69.197.160", 50000))
+    serversocket.listen(5)
+    print ("i listening")
+    while 1:
+        clientsocket, address = serversocket.accept()
+        client(clientsocket, address,cursor,cnxn)
 
 
 if __name__ == "__main__":

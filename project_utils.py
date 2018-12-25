@@ -173,9 +173,9 @@ def nn_func(X,Y):
                   learning_rate="constant", learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True,
                   random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
                   early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
-    clf = clf.fit(X, Y)
     scores = cross_val_score(clf, X, Y, cv=10,n_jobs=-1)
     print(np.mean(scores))
+    clf = clf.fit(X, Y)
     return clf
     #scores = lr.scores_['1']
     #mean_scores = np.mean(scores, axis=0)
@@ -220,13 +220,13 @@ def lr_func(X,Y):
 
 
 def svm_func(X, Y_train):
-    clf = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+    clf = SVC(C=1.0, cache_size=200,kernel="linear", class_weight=None, coef0=0.0,
         decision_function_shape='ovr', degree=3, gamma='auto',
         max_iter = -1, random_state=777, shrinking=True,
         tol=0.02, verbose=False,probability = True)
+    scores = cross_val_score(clf, X, Y_train, cv=10, n_jobs=-1)
+    print(np.mean(scores))
     clf.fit(X, Y_train)
-    scores = cross_val_score(clf, X, Y_train, cv=10,n_jobs=-1)
-    print (np.mean(scores))
     return clf
 
 
@@ -257,3 +257,5 @@ def connect_sql_server():
         'DRIVER=' + driver + ';SERVER=' + server + ';PORT=1433;DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
     cursor = cnxn.cursor()
     return cursor,cnxn
+
+# def statistics
