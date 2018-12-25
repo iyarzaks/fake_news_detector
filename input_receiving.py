@@ -11,6 +11,10 @@ import requests
 
 
 
+
+"""transforms URL to a DataFrame containing readable attributes (header, body etc."""
+
+
 def convertUrlToDF(inputURL):
     singleInputDict = {}
     singleInputDict['URLs'] = inputURL
