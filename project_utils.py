@@ -73,6 +73,7 @@ def compare_clfs(X,Y,X_TDF='',Y_TDF=''):
     # names = names+new_list
     results_series = pd.Series(results_list, index=names)
     results_series = results_series.sort_values()
+    results_series.to_csv("body_results.csv")
     results_series.plot(kind="bar")
     import matplotlib.pyplot
     matplotlib.pyplot.show()

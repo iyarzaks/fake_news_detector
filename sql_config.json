@@ -1,7 +1,7 @@
 {
-  "server" : "tamarp.database.windows.net",
+  "server" : "tanyab.database.windows.net",
     "database" : "fake_news_DB",
-    "username" : "tperetz",
+    "username" : "tbel",
     "password" : "Fakenews!",
     "driver" : "{SQL Server}"
 }

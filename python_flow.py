@@ -29,7 +29,6 @@ class client(Thread):
                 url = str(rcvdData)[4:]
                 print ("got it:" + url)
                 result = url_query(url, self.cursor, self.cnxn)
-                print (result)
             elif "sql-" in rcvdData:
                 sql_str = str(rcvdData)[4:]
                 print("got it:" + sql_str)
@@ -72,7 +71,7 @@ def get_results(df_with_imp_words,clfs_dic):
         total_weight += result[clf]["weight"]
         results.append(result[clf]["score"])
     avg = round(tot_avg/total_weight, 2)
-    results.append(avg)
+    results.insert(0, avg)
     return results
 
 
@@ -95,13 +94,16 @@ def check_new_article(test_df):
 """manage front end query. input - url address , output -probabilities """
 
 
-def url_query(url, cursor,cnxn):
+def url_query(url, cursor="",cnxn=""):
     aritcle_csv = convertUrlToDF(url)
     if type(aritcle_csv) == type("alon"):
         return "err"
     res = check_new_article(aritcle_csv)
     add_to_db(cursor,url,res,str(aritcle_csv.loc[0,"HeadLine"]),cnxn)
-    return str(res).replace("[","").replace("]","").replace(" ","")
+    res_str = str(res).replace("[","").replace("]","").replace(" ","")
+    res_str += ";"+str(aritcle_csv.loc[0,"HeadLine"])
+    return res_str
+    # return str(res).replace("[","").replace("]","").replace(',',";")
 
 
 """check if url already exist in DB"""
@@ -170,7 +172,7 @@ def sql_response(sql_str,cursor,cnxn):
                     ORDER BY COUNT(HIST_aID) DESC);"""
     elif sql_str == "top_n_sites":
         query = """SELECT domain
-                    FROM (SELECT top 2 domain,COUNT(domain) AS domainCount
+                    FROM (SELECT top 3 domain,COUNT(domain) AS domainCount
                     FROM ARTICLE WHERE modelResult = 0
                     GROUP BY domain
                     ORDER BY domainCount DESC) ARTICLE_COUNT"""
@@ -184,9 +186,13 @@ def sql_response(sql_str,cursor,cnxn):
 
 
 def main():
-    cursor, cnxn = connect_sql_server()
+    try:
+        cursor, cnxn = connect_sql_server()
+    except:
+        print ("can not connect sql server.")
+        return 1
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serversocket.bind(("132.69.197.160", 50000))
+    serversocket.bind(("176.13.226.85", 50000))
     serversocket.listen(5)
     print ("i listening")
     while 1:
